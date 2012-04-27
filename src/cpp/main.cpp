@@ -4,7 +4,6 @@
 #include "GLUTWindowManagers.h"
 #include "cuda_gl_interop.h"
 
-#include "MandelBrotImage.hpp"
 #include "JuliaImage.hpp"
 
 #include "cudaTools.h"
@@ -14,8 +13,8 @@ int bench(int argc, char** argv);
 int launchApplication(int argc, char** argv);
 
 int main(int argc, char** argv){
-    //return launchApplication();
-    return bench(argc, argv);
+    return launchApplication(argc, argv);
+    //return bench(argc, argv);
 }
 
 int launchApplication(int argc, char** argv){
@@ -34,31 +33,16 @@ int launchApplication(int argc, char** argv){
 
 	GLImageFonctionelCudaSelections* image;
 
-	bool mandelbrot = false;
+	std::cout << "Launch Julia in Cuda" << std::endl;
 
-	if(mandelbrot){
-	    std::cout << "Launch MandelBrot in Cuda" << std::endl;
+	float xMin = -1.7;
+	float xMax = +1.7;
+	float yMin = -1.1;
+	float yMax = +1.1;
 
-	    float xMin = -1.3968;
-	    float xMax = -1.3578;
-	    float yMin = -0.03362;
-	    float yMax = 0.0013973;
+	DomaineMaths domain(xMin, yMin, xMax - xMin, yMax - yMin);
 
-	    DomaineMaths domain(xMin, yMin, xMax - xMin, yMax - yMin);
-
-	    image = new GLMandelBrotImage(w, h, domain);
-	} else {
-	    std::cout << "Launch Julia in Cuda" << std::endl;
-
-	    float xMin = -1.7;
-	    float xMax = +1.7;
-	    float yMin = -1.1;
-	    float yMax = +1.1;
-
-	    DomaineMaths domain(xMin, yMin, xMax - xMin, yMax - yMin);
-
-	    image = new GLJuliaImage(w, h, domain);
-	}
+	image = new GLJuliaImage(w, h, domain);
 
 	glutWindowManager->createWindow(image);
 	glutWindowManager->runALL(); //Blocking
@@ -74,7 +58,6 @@ int launchApplication(int argc, char** argv){
 #define DIM_H 12000
 #define DIM_W 16000
 
-void launchMandelBrotAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew);
 void launchJuliaAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew);
 
 int bench(int argc, char** argv){
@@ -107,33 +90,13 @@ int bench(int argc, char** argv){
 	    float yMin = -0.03362;
 	    float yMax = 0.0013973;
 
-	    DomaineMaths domain1(xMin, yMin, xMax - xMin, yMax - yMin);
-
-	    for(int i = 0; i < 10; ++i){
-		launchMandelBrotAnimation(image, DIM_W, DIM_H, 100, domain1);
-	    }
-
-	    float elapsed = 0;
-	    HANDLE_ERROR(cudaEventRecord(stop,0));
-	    HANDLE_ERROR(cudaEventSynchronize(stop));
-	    HANDLE_ERROR(cudaEventElapsedTime(&elapsed, start, stop));
-
-	    std::cout << "MandelBrot CUDA Version took " << elapsed << "ms" << std::endl;
-
-	    HANDLE_ERROR(cudaEventRecord(start,0));
-
-	    xMin = -1.3968;
-	    xMax = -1.3578;
-	    yMin = -0.03362;
-	    yMax = 0.0013973;
-
 	    DomaineMaths domain2(xMin, yMin, xMax - xMin, yMax - yMin);
 
 	    for(int i = 0; i < 10; ++i){
 		launchJuliaAnimation(image, DIM_W, DIM_H, 100, domain2);
 	    }
 
-	    elapsed = 0;
+	    float elapsed = 0;
 	    HANDLE_ERROR(cudaEventRecord(stop,0));
 	    HANDLE_ERROR(cudaEventSynchronize(stop));
 	    HANDLE_ERROR(cudaEventElapsedTime(&elapsed, start, stop));
