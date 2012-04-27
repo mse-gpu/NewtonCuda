@@ -1,19 +1,19 @@
 #include "Tools.hpp"
 
-__global__ static void juliaAnimation(uchar4* ptrDevPixels, int w, int h, int N, DomaineMaths domainNew, CalibreurCudas calibreur);
+__global__ static void newtonAnimation(uchar4* ptrDevPixels, int w, int h, int N, DomaineMaths domainNew, CalibreurCudas calibreur);
 
-__device__ static float julia(float x, float y, int N);
+__device__ static float newton(float x, float y, int N);
 
-void launchJuliaAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew){
+void launchNewtonAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew){
     dim3 blockPerGrid = dim3(32, 32, 1);
     dim3 threadPerBlock = dim3(16, 16, 1);
 
     //TODO Check the value 0.7f
     CalibreurCudas calibreur(0, N, 0.0f, 0.7f);
-    juliaAnimation<<<blockPerGrid,threadPerBlock>>>(ptrDevPixels, w, h, N, domainNew, calibreur);
+    newtonAnimation<<<blockPerGrid,threadPerBlock>>>(ptrDevPixels, w, h, N, domainNew, calibreur);
 }
 
-__global__ static void juliaAnimation(uchar4* ptrDevPixels, int w, int h, int N, DomaineMaths domainNew, CalibreurCudas calibreur){
+__global__ static void newtonAnimation(uchar4* ptrDevPixels, int w, int h, int N, DomaineMaths domainNew, CalibreurCudas calibreur){
     int i = threadIdx.y + blockIdx.y * blockDim.y;
     int j = threadIdx.x + blockIdx.x * blockDim.x;
 
@@ -36,7 +36,7 @@ __global__ static void juliaAnimation(uchar4* ptrDevPixels, int w, int h, int N,
 	x = domainNew.x0 + pixelJ * dx;
 	y = domainNew.y0 + pixelI * dy;
 
-	float h = julia(x, y, N);
+	float h = newton(x, y, N);
 	if(h == 0){
 	    r = 0;
 	    g = 0;
@@ -58,7 +58,7 @@ __global__ static void juliaAnimation(uchar4* ptrDevPixels, int w, int h, int N,
 #define CREAL -0.745
 #define CIMAG 0.1
 
-__device__ static float julia(float x, float y, int N){
+__device__ static float newton(float x, float y, int N){
     float real = x;
     float imag = y;
 

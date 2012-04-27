@@ -4,7 +4,7 @@
 #include "GLUTWindowManagers.h"
 #include "cuda_gl_interop.h"
 
-#include "JuliaImage.hpp"
+#include "NewtonImage.hpp"
 
 #include "cudaTools.h"
 #include "deviceTools.h"
@@ -33,7 +33,7 @@ int launchApplication(int argc, char** argv){
 
 	GLImageFonctionelCudaSelections* image;
 
-	std::cout << "Launch Julia in Cuda" << std::endl;
+	std::cout << "Launch Newton in Cuda" << std::endl;
 
 	float xMin = -1.7;
 	float xMax = +1.7;
@@ -42,7 +42,7 @@ int launchApplication(int argc, char** argv){
 
 	DomaineMaths domain(xMin, yMin, xMax - xMin, yMax - yMin);
 
-	image = new GLJuliaImage(w, h, domain);
+	image = new GLNewtonImage(w, h, domain);
 
 	glutWindowManager->createWindow(image);
 	glutWindowManager->runALL(); //Blocking
@@ -58,7 +58,7 @@ int launchApplication(int argc, char** argv){
 #define DIM_H 12000
 #define DIM_W 16000
 
-void launchJuliaAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew);
+void launchNewtonAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew);
 
 int bench(int argc, char** argv){
     std::cout << "Launch benchmark" << std::endl;
@@ -93,7 +93,7 @@ int bench(int argc, char** argv){
 	    DomaineMaths domain2(xMin, yMin, xMax - xMin, yMax - yMin);
 
 	    for(int i = 0; i < 10; ++i){
-		launchJuliaAnimation(image, DIM_W, DIM_H, 100, domain2);
+		launchNewtonAnimation(image, DIM_W, DIM_H, 100, domain2);
 	    }
 
 	    float elapsed = 0;
@@ -101,7 +101,7 @@ int bench(int argc, char** argv){
 	    HANDLE_ERROR(cudaEventSynchronize(stop));
 	    HANDLE_ERROR(cudaEventElapsedTime(&elapsed, start, stop));
 
-	    std::cout << "Julia CUDA Version took " << elapsed << "ms" << std::endl;
+	    std::cout << "Newton CUDA Version took " << elapsed << "ms" << std::endl;
 
 	    HANDLE_ERROR(cudaEventDestroy(start));
 	    HANDLE_ERROR(cudaEventDestroy(stop));
