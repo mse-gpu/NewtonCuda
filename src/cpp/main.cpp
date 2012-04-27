@@ -28,19 +28,14 @@ int launchApplication(int argc, char** argv){
 	GLUTWindowManagers::init(argc, argv);
 	GLUTWindowManagers* glutWindowManager = GLUTWindowManagers::getInstance();
 
-	int w = 800;
-	int h = 600;
-
 	GLImageFonctionelCudaSelections* image;
 
 	std::cout << "Launch Newton in Cuda" << std::endl;
 
-	float xMin = -1.7;
-	float xMax = +1.7;
-	float yMin = -1.1;
-	float yMax = +1.1;
+	int w = 800;
+	int h = 800;
 
-	DomaineMaths domain(xMin, yMin, xMax - xMin, yMax - yMin);
+	DomaineMaths domain(0, 0, w, h);
 
 	image = new GLNewtonImage(w, h, domain);
 
@@ -58,7 +53,7 @@ int launchApplication(int argc, char** argv){
 #define DIM_H 12000
 #define DIM_W 16000
 
-void launchNewtonAnimation(uchar4* ptrDevPixels, int w, int h, int N, const DomaineMaths& domainNew);
+void launchNewtonAnimation(uchar4* ptrDevPixels, int w, int h, const DomaineMaths& domainNew);
 
 int bench(int argc, char** argv){
     std::cout << "Launch benchmark" << std::endl;
@@ -93,7 +88,7 @@ int bench(int argc, char** argv){
 	    DomaineMaths domain2(xMin, yMin, xMax - xMin, yMax - yMin);
 
 	    for(int i = 0; i < 10; ++i){
-		launchNewtonAnimation(image, DIM_W, DIM_H, 100, domain2);
+		launchNewtonAnimation(image, DIM_W, DIM_H, domain2);
 	    }
 
 	    float elapsed = 0;
