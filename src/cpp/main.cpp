@@ -13,8 +13,8 @@ int bench(int argc, char** argv);
 int launchApplication(int argc, char** argv);
 
 int main(int argc, char** argv){
-    return launchApplication(argc, argv);
-    //return bench(argc, argv);
+    //return launchApplication(argc, argv);
+    return bench(argc, argv);
 }
 
 int launchApplication(int argc, char** argv){
@@ -50,8 +50,9 @@ int launchApplication(int argc, char** argv){
     }
 }
 
-#define DIM_H 12000
-#define DIM_W 16000
+#define DIM_H 10000
+#define DIM_W 10000
+#define TIMES 25
 
 void launchNewtonAnimation(uchar4* ptrDevPixels, int w, int h, const DomaineMaths& domainNew);
 
@@ -65,9 +66,6 @@ int bench(int argc, char** argv){
 	    HANDLE_ERROR(cudaSetDeviceFlags(cudaDeviceMapHost)); // Not all gpu allow the use of mapMemory (avant prremier appel au kernel)
 
 	    //Force the driver to run
-	    int* fake;
-	    HANDLE_ERROR(cudaMalloc((void**) &fake, sizeof(int)));
-
 	    uchar4* image;
 	    HANDLE_ERROR(cudaMalloc(&image, DIM_W * DIM_H * sizeof(uchar4)));
 
@@ -80,15 +78,10 @@ int bench(int argc, char** argv){
 	    HANDLE_ERROR(cudaEventCreate(&stop, CU_EVENT_DEFAULT));
 	    HANDLE_ERROR(cudaEventRecord(start,0));
 
-	    float xMin = -1.3968;
-	    float xMax = -1.3578;
-	    float yMin = -0.03362;
-	    float yMax = 0.0013973;
+	    DomaineMaths domain(0, 0, DIM_W, DIM_H);
 
-	    DomaineMaths domain2(xMin, yMin, xMax - xMin, yMax - yMin);
-
-	    for(int i = 0; i < 10; ++i){
-		launchNewtonAnimation(image, DIM_W, DIM_H, domain2);
+	    for(int i = 0; i < TIMES; ++i){
+		launchNewtonAnimation(image, DIM_W, DIM_H, domain);
 	    }
 
 	    float elapsed = 0;
@@ -96,13 +89,13 @@ int bench(int argc, char** argv){
 	    HANDLE_ERROR(cudaEventSynchronize(stop));
 	    HANDLE_ERROR(cudaEventElapsedTime(&elapsed, start, stop));
 
-	    std::cout << "Newton CUDA Version took " << elapsed << "ms" << std::endl;
+	    std::cout << "Total (" << TIMES << " times) = " << elapsed << "ms" << std::endl;
+	    std::cout << "Mean  (" << TIMES << " times) = " << (elapsed / TIMES) << "ms" << std::endl;
 
 	    HANDLE_ERROR(cudaEventDestroy(start));
 	    HANDLE_ERROR(cudaEventDestroy(stop));
 
 	    HANDLE_ERROR(cudaFree(image));
-	    HANDLE_ERROR(cudaFree(fake));
 
 	    return EXIT_SUCCESS;
     } else {
